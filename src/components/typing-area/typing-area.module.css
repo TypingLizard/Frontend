@@ -1,0 +1,66 @@
+.typing_box {
+    display: block;
+    max-width: 400px;
+    height: 140px;
+    overflow: hidden;
+    margin-left: auto;
+    margin-right: auto;
+    position: relative;
+    top: 10%;
+}
+
+#words {
+    font-size: 18px;
+    display: flex;
+    flex-wrap: wrap;
+    width: 100%;
+    align-content: center;
+    user-select: none;
+}
+
+div#game {
+    line-height: 35px;
+    height: 105px;
+    overflow: hidden;
+    position: relative;
+}
+
+#focus_error {
+    position: absolute;
+    inset: 0;
+    text-align: center;
+    padding-top: 35px;
+}
+
+#words {
+    /*filter: blur(5px);*/
+    color: var(--secondary);
+}
+
+/*#game:focus #words {*/
+/*    filter: blur(0);*/
+/*}*/
+
+/*#game:focus #focus_error {*/
+/*    display: none;*/
+/*}*/
+
+div.word {
+    display: inline-block;
+    margin: 0 5px;
+    font-family: 'Roboto Mono', monospace;
+    border-bottom: 2px solid transparent;
+    transition: border-bottom 0.3s;
+}
+
+div.cursor {
+
+}
+
+.letter.correct {
+    color: #f1f1f1;
+}
+
+.letter.incorrect {
+    color: #c00000;
+}
