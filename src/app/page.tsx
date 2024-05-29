@@ -1,11 +1,12 @@
 import TypingArea from "@/components/typing-area/TypingArea";
 import Navbar from "@/components/navbar/Navbar";
+import Footer from "@/components/footer/Footer";
 
 export default function Home() {
     return (
         <>
+            <Navbar/>
             <main>
-                <Navbar/>
                 <h1>Home</h1>
                 <p>Welcome to your Next.js app.</p>
                 <div id="header">
@@ -18,6 +19,7 @@ export default function Home() {
                 </div>
                 <TypingArea/>
             </main>
+
         </>
     );
 }
