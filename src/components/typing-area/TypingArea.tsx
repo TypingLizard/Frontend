@@ -1,9 +1,17 @@
 "use client"
 
-import React, {useEffect} from 'react';
+import React, {useEffect, useState} from 'react';
 import dynamic from "next/dynamic";
 
-const TypingArea = () => {
+type TypingAreaProps = {
+    onTypingStart: () => void;
+    isTypingDisabled: boolean;
+};
+
+const TypingArea = ({onTypingStart, isTypingDisabled}: TypingAreaProps) => {
+
+    let GLOBAL_TIMER = 30;
+    const [timer, setTimer] = useState(GLOBAL_TIMER)
 
     const words: string[] = [
         "time", "year", "people", "way", "day", "man", "thing", "woman", "life", "child",
@@ -18,8 +26,7 @@ const TypingArea = () => {
         "history", "party", "result", "change", "morning", "reason", "research", "girl", "guy",
         "moment", "air", "teacher", "force", "education"
     ];
-    const gameTimer30 = 30*1000;
-    window.timer = null;
+
 
     // get Position of first Character
     useEffect(() => {
@@ -34,6 +41,9 @@ const TypingArea = () => {
         if (gameDiv) {
             // Add keydown event listener
             gameDiv.addEventListener('keydown', (e) => {
+                // notify timer
+                onTypingStart();
+
                 const key = e.key;//.toLowerCase();
                 const currentWord = document.querySelector('.word.current') as HTMLElement;
                 const currentLetter = document.querySelector('.letter.current') as HTMLElement;
@@ -46,6 +56,8 @@ const TypingArea = () => {
 
                 // DEBUG
                 console.log('key:', key);
+
+
 
                 if (isLetter) {
                     if (currentLetter) {
@@ -109,6 +121,14 @@ const TypingArea = () => {
                         addClass(currentWord.lastChild as HTMLElement, 'current');
                         removeClass(currentWord.lastChild as HTMLElement, 'incorrect');
                         removeClass(currentWord.lastChild as HTMLElement, 'correct');
+
+                        // remove last letter of current word with 'extra' class
+                        const extraLetters = document.querySelectorAll('.word.current .letter.extra') as NodeListOf<HTMLElement>;
+                        const lastExtraLetter = extraLetters[extraLetters.length - 1];
+                        if (lastExtraLetter) {
+                            lastExtraLetter.remove();
+                        }
+
                     }
                 }
 
@@ -132,7 +152,7 @@ const TypingArea = () => {
                 }
             });
         }
-    }, []);
+    }, [isTypingDisabled]);
 
     function addClass(el: HTMLElement, className: string) {
         el.className += ' ' + className;
@@ -177,7 +197,7 @@ const TypingArea = () => {
         if (activeWord) addClass(activeWord, 'current');
         if (activeLetter) addClass(activeLetter, 'current');
 
-
+        GLOBAL_TIMER = 30;
     }
 
     return (
