@@ -31,20 +31,6 @@ const TypingArea = ({ onTypingStart, isTypingDisabled }: TypingAreaProps) => {
         };
 
 
-    const initializeGame = async () => {
-        const mode = await fetchData();
-        if (!mode) {
-            console.log("mode null")
-
-            return;
-
-        }
-        console.log("mode not null")
-
-        newGame(mode);
-    }
-
-
     const gameDivRef = useRef<HTMLDivElement>(null);
     const wordsDivRef = useRef<HTMLDivElement>(null);
     const cursorRef = useRef<HTMLDivElement>(null);
@@ -57,7 +43,11 @@ const TypingArea = ({ onTypingStart, isTypingDisabled }: TypingAreaProps) => {
         el.classList.remove(className);
     }, []);
 
-    const getRandomWord = useCallback(() => {
+    const getRandomWord = useCallback((mode:Mode) => {
+        const wordName = mode.wordList.map(word => word.wordName);
+
+        setWords(wordName);
+
         console.log(words)
         return words[Math.floor(Math.random() * words.length)];
     }, [words]);
@@ -66,19 +56,17 @@ const TypingArea = ({ onTypingStart, isTypingDisabled }: TypingAreaProps) => {
         return `<div class="word"><span class="letter">${word.split('').join('</span><span class="letter">')}</span></div>`;
     }, []);
 
+
     const newGame = useCallback((mode:Mode) => {
 
-        const wordName = mode.wordList.map(word => word.wordName);
-
-        setWords(wordName);
-
         setTimer(mode.modeTime);
+
 
         const wordsDiv = wordsDivRef.current;
         if (wordsDiv) {
             wordsDiv.innerHTML = '';
             for (let i = 0; i < 200; i++) {
-                wordsDiv.innerHTML += formatWord(getRandomWord());
+                wordsDiv.innerHTML += formatWord(getRandomWord(mode));
             }
 
             const activeWord = wordsDiv.querySelector('.word') as HTMLElement;
@@ -188,6 +176,19 @@ const TypingArea = ({ onTypingStart, isTypingDisabled }: TypingAreaProps) => {
     }, [addClass, onTypingStart, removeClass, isTypingDisabled]);
 
     useEffect(() => {
+
+        const initializeGame = async () => {
+            const mode = await fetchData();
+            if (!mode) {
+                console.log("mode null")
+
+                return;
+
+            }
+            console.log("mode not null")
+
+            newGame(mode);
+        }
         initializeGame().catch(err => console.error("my error ", err)).then(() => {
             console.log("in use effect!!")
             // add event listener to the game div
