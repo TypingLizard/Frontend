@@ -28,7 +28,6 @@ const TypingArea = () => {
 
     useEffect(() => {
         newGame();
-
         // add event listener to the game div
         const gameDiv = document.getElementById('game');
         if (gameDiv) {
