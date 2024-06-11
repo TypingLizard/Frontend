@@ -29,6 +29,15 @@ const TypingArea = ({ onTypingStart, isTypingDisabled }: TypingAreaProps) => {
         };
 
 
+    const initializeGame = async () => {
+        const mode = await fetchData();
+        if (!mode) {
+            return;
+        }
+
+        newGame(mode);
+    }
+
 
     const gameDivRef = useRef<HTMLDivElement>(null);
     const wordsDivRef = useRef<HTMLDivElement>(null);
@@ -62,6 +71,11 @@ const TypingArea = ({ onTypingStart, isTypingDisabled }: TypingAreaProps) => {
             const activeLetter = wordsDiv.querySelector('.letter') as HTMLElement;
             if (activeWord) addClass(activeWord, 'current');
             if (activeLetter) addClass(activeLetter, 'current');
+
+            const wordName = mode.wordList.map(word => word.wordName);
+            setWords(wordName);
+
+            setTimer(mode.modeTime);
         }
     }, [addClass, formatWord, getRandomWord]);
 
@@ -163,7 +177,10 @@ const TypingArea = ({ onTypingStart, isTypingDisabled }: TypingAreaProps) => {
     }, [addClass, onTypingStart, removeClass, isTypingDisabled]);
 
     useEffect(() => {
-        newGame();
+        initializeGame().then(
+
+
+        )
 
         // add event listener to the game div
         const gameDiv = gameDivRef.current;
