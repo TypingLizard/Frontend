@@ -3,7 +3,7 @@
 import React, {useEffect, useState} from 'react';
 import dynamic from "next/dynamic";
 import axios from "axios";
-import {Mode} from "@/app/interfaces/modles";
+import {Mode, Word} from "@/app/interfaces/modles";
 
 const TypingArea = () => {
 
@@ -11,33 +11,31 @@ const TypingArea = () => {
     const [error, setError] = useState<string | null>(null);
     const [timer, setTimer] = useState<number | null>(30)
 
-    useEffect(() => {
-        const fetchData = async () => {
-            try {
-                const response = await axios.get<Mode>('http://localhost:8080/mode/id/1');
-                const wordNames = response.data.wordList.map(word => word.wordName);
-                setWords(wordNames);
-                setTimer(response.data.modeTime);
-                console.log(wordNames)
-            } catch (err) {
-                setError('Error fetching data');
-            }
-        };
 
-        fetchData();
-    }, [words, error, timer]);
+    const fetchData = async (): Promise<Mode | undefined> => {
+        try {
+            const response = await axios.get<Mode>('http://localhost:8080/mode/id/1');
+            return response.data;
+
+        } catch (err) {
+            setError('Error fetching data');
+        }
+    };
 
 
-    const gameTimer30 = 30*1000;
-   // window.timer = null;
 
-    // get Position of first Character
-    useEffect(() => {
+    const initializeGame = async () => {
+        const mode = await fetchData();
+        if (!mode) {
+            return;
+        }
 
-    }, []);
+        newGame(mode);
+    }
 
     useEffect(() => {
-        newGame();
+    initializeGame().catch(err => console.error("my error ", err)).then(() => {
+        console.log("TEST after")
 
         // add event listener to the game div
         const gameDiv = document.getElementById('game');
@@ -142,6 +140,9 @@ const TypingArea = () => {
                 }
             });
         }
+        }
+    )
+
     }, []);
 
     function addClass(el: HTMLElement, className: string) {
@@ -153,7 +154,10 @@ const TypingArea = () => {
     }
 
 
-    function getRandomWord() {
+    function getRandomWord(words: Word[]) {
+        console.log(words)
+        console.log("get random word log at pos 1 " + words[1])
+        console.log("get random word log " + words[Math.floor(Math.random() * words.length)])
         return words[Math.floor(Math.random() * words.length)];
 
         // const randomIndex = Math.ceil(Math.random() * words.length);
@@ -164,12 +168,12 @@ const TypingArea = () => {
         // return `<div class="word">
         //            <span class="letter">${word.split('').join('</span><span class="letter">')}</span>
         //         </div>`;
-
+        console.log("formatWord log " +word)
         return `<div class="word"><span class="letter">${word.split('').join('</span><span class="letter">')}</span></div>`;
     }
 
     // this function will start the game and initialize everything
-    const newGame = () => {
+    const newGame = (mode: Mode) => {
         // reset the div with id words
         const wordsDiv = document.getElementById('words');
         if (wordsDiv) {
@@ -178,7 +182,7 @@ const TypingArea = () => {
 
         // will 'words' with random words
         for (let i = 0; i < 200; i++) {
-            wordsDiv!.innerHTML += formatWord(getRandomWord());
+            wordsDiv!.innerHTML += formatWord(getRandomWord(mode.wordList).wordName);
         }
 
         // set the first word as active
@@ -187,6 +191,10 @@ const TypingArea = () => {
         if (activeWord) addClass(activeWord, 'current');
         if (activeLetter) addClass(activeLetter, 'current');
 
+        const wordName = mode.wordList.map(word => word.wordName);
+        setWords(wordName);
+
+        setTimer(mode.modeTime);
 
     }
 
