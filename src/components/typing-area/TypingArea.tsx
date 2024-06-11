@@ -2,6 +2,9 @@
 
 import React, { useEffect, useState, useRef, useCallback } from 'react';
 import dynamic from "next/dynamic";
+import {Mode} from "node:fs";
+import axios from "axios";
+import {Mode, Word} from "@/app/interfaces/modles";
 
 type TypingAreaProps = {
     onTypingStart: () => void;
@@ -26,6 +29,24 @@ const TypingArea = ({ onTypingStart, isTypingDisabled }: TypingAreaProps) => {
         "moment", "air", "teacher", "force", "education"
     ]);
 
+
+
+
+        const [words, setWords] = useState<string[]>([]);
+        const [error, setError] = useState<string | null>(null);
+        const [timer, setTimer] = useState<number | null>(30)
+
+
+        const fetchData = async (): Promise<Mode | undefined> => {
+            try {
+                const response = await axios.get<Mode>('http://localhost:8080/mode/id/1');
+                return response.data;
+
+            } catch (err) {
+                setError('Error fetching data');
+            }
+        };
+
     const gameDivRef = useRef<HTMLDivElement>(null);
     const wordsDivRef = useRef<HTMLDivElement>(null);
     const cursorRef = useRef<HTMLDivElement>(null);
@@ -46,7 +67,7 @@ const TypingArea = ({ onTypingStart, isTypingDisabled }: TypingAreaProps) => {
         return `<div class="word"><span class="letter">${word.split('').join('</span><span class="letter">')}</span></div>`;
     }, []);
 
-    const newGame = useCallback(() => {
+    const newGame = useCallback((mode:Mode) => {
         const wordsDiv = wordsDivRef.current;
         if (wordsDiv) {
             wordsDiv.innerHTML = '';
