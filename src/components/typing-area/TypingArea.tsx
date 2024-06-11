@@ -1,25 +1,35 @@
 "use client"
 
-import React, {useEffect} from 'react';
+import React, {useEffect, useState} from 'react';
 import dynamic from "next/dynamic";
+import axios from "axios";
+import {Mode} from "@/app/interfaces/modles";
 
 const TypingArea = () => {
 
-    const words: string[] = [
-        "time", "year", "people", "way", "day", "man", "thing", "woman", "life", "child",
-        "world", "school", "state", "family", "student", "group", "country", "problem", "hand",
-        "part", "place", "case", "week", "company", "system", "program", "question", "work",
-        "government", "number", "night", "point", "home", "water", "room", "mother", "area",
-        "money", "story", "fact", "month", "lot", "right", "study", "book", "eye", "job", "word",
-        "business", "issue", "side", "kind", "head", "house", "service", "friend", "father",
-        "power", "hour", "game", "line", "end", "member", "law", "car", "city", "community",
-        "name", "president", "team", "minute", "idea", "kid", "body", "information", "back",
-        "parent", "face", "others", "level", "office", "door", "health", "person", "art", "war",
-        "history", "party", "result", "change", "morning", "reason", "research", "girl", "guy",
-        "moment", "air", "teacher", "force", "education"
-    ];
+    const [words, setWords] = useState<string[]>([]);
+    const [error, setError] = useState<string | null>(null);
+    const [timer, setTimer] = useState<number | null>(30)
+
+    useEffect(() => {
+        const fetchData = async () => {
+            try {
+                const response = await axios.get<Mode>('http://localhost:8080/mode/id/1');
+                const wordNames = response.data.wordList.map(word => word.wordName);
+                setWords(wordNames);
+                setTimer(response.data.modeTime);
+                console.log(wordNames)
+            } catch (err) {
+                setError('Error fetching data');
+            }
+        };
+
+        fetchData();
+    }, [words, error, timer]);
+
+
     const gameTimer30 = 30*1000;
-    window.timer = null;
+   // window.timer = null;
 
     // get Position of first Character
     useEffect(() => {
