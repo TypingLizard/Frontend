@@ -21,7 +21,9 @@ const TypingArea = ({ onTypingStart, isTypingDisabled }: TypingAreaProps) => {
         const fetchData = async (): Promise<Mode | undefined> => {
             try {
                 const response = await axios.get<Mode>('http://localhost:8080/mode/id/1');
+                console.log("fetching Data")
                 return response.data;
+
 
             } catch (err) {
                 setError('Error fetching data');
@@ -32,8 +34,12 @@ const TypingArea = ({ onTypingStart, isTypingDisabled }: TypingAreaProps) => {
     const initializeGame = async () => {
         const mode = await fetchData();
         if (!mode) {
+            console.log("mode null")
+
             return;
+
         }
+        console.log("mode not null")
 
         newGame(mode);
     }
@@ -52,6 +58,7 @@ const TypingArea = ({ onTypingStart, isTypingDisabled }: TypingAreaProps) => {
     }, []);
 
     const getRandomWord = useCallback(() => {
+        console.log(words)
         return words[Math.floor(Math.random() * words.length)];
     }, [words]);
 
@@ -60,6 +67,13 @@ const TypingArea = ({ onTypingStart, isTypingDisabled }: TypingAreaProps) => {
     }, []);
 
     const newGame = useCallback((mode:Mode) => {
+
+        const wordName = mode.wordList.map(word => word.wordName);
+
+        setWords(wordName);
+
+        setTimer(mode.modeTime);
+
         const wordsDiv = wordsDivRef.current;
         if (wordsDiv) {
             wordsDiv.innerHTML = '';
@@ -72,10 +86,7 @@ const TypingArea = ({ onTypingStart, isTypingDisabled }: TypingAreaProps) => {
             if (activeWord) addClass(activeWord, 'current');
             if (activeLetter) addClass(activeLetter, 'current');
 
-            const wordName = mode.wordList.map(word => word.wordName);
-            setWords(wordName);
 
-            setTimer(mode.modeTime);
         }
     }, [addClass, formatWord, getRandomWord]);
 
@@ -177,20 +188,19 @@ const TypingArea = ({ onTypingStart, isTypingDisabled }: TypingAreaProps) => {
     }, [addClass, onTypingStart, removeClass, isTypingDisabled]);
 
     useEffect(() => {
-        initializeGame().then(
+        initializeGame().catch(err => console.error("my error ", err)).then(() => {
+            console.log("in use effect!!")
+            // add event listener to the game div
+            const gameDiv = gameDivRef.current;
 
+            if (gameDiv) {
+                gameDiv.addEventListener('keydown', handleKeyDown);
+                return () => {
+                    gameDiv.removeEventListener('keydown', handleKeyDown);
+                };
+            }
+        })
 
-        )
-
-        // add event listener to the game div
-        const gameDiv = gameDivRef.current;
-
-        if (gameDiv) {
-            gameDiv.addEventListener('keydown', handleKeyDown);
-            return () => {
-                gameDiv.removeEventListener('keydown', handleKeyDown);
-            };
-        }
     }, [handleKeyDown, newGame]);
 
     return (
