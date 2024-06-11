@@ -1,11 +1,18 @@
 "use client"
 
-import React, {useEffect} from 'react';
+import React, { useEffect, useState, useRef, useCallback } from 'react';
 import dynamic from "next/dynamic";
 
-const TypingArea = () => {
+type TypingAreaProps = {
+    onTypingStart: () => void;
+    isTypingDisabled: boolean;
+};
 
-    const words: string[] = [
+const TypingArea = ({ onTypingStart, isTypingDisabled }: TypingAreaProps) => {
+
+    const GLOBAL_TIMER = 30;
+    const [timer, setTimer] = useState(GLOBAL_TIMER);
+    const [words] = useState([
         "time", "year", "people", "way", "day", "man", "thing", "woman", "life", "child",
         "world", "school", "state", "family", "student", "group", "country", "problem", "hand",
         "part", "place", "case", "week", "company", "system", "program", "question", "work",
@@ -17,178 +24,163 @@ const TypingArea = () => {
         "parent", "face", "others", "level", "office", "door", "health", "person", "art", "war",
         "history", "party", "result", "change", "morning", "reason", "research", "girl", "guy",
         "moment", "air", "teacher", "force", "education"
-    ];
-    const gameTimer30 = 30*1000;
-    window.timer = null;
+    ]);
 
-    // get Position of first Character
-    useEffect(() => {
+    const gameDivRef = useRef<HTMLDivElement>(null);
+    const wordsDivRef = useRef<HTMLDivElement>(null);
+    const cursorRef = useRef<HTMLDivElement>(null);
 
+    const addClass = useCallback((el: HTMLElement, className: string) => {
+        el.classList.add(className);
     }, []);
+
+    const removeClass = useCallback((el: HTMLElement, className: string) => {
+        el.classList.remove(className);
+    }, []);
+
+    const getRandomWord = useCallback(() => {
+        return words[Math.floor(Math.random() * words.length)];
+    }, [words]);
+
+    const formatWord = useCallback((word: string) => {
+        return `<div class="word"><span class="letter">${word.split('').join('</span><span class="letter">')}</span></div>`;
+    }, []);
+
+    const newGame = useCallback(() => {
+        const wordsDiv = wordsDivRef.current;
+        if (wordsDiv) {
+            wordsDiv.innerHTML = '';
+            for (let i = 0; i < 200; i++) {
+                wordsDiv.innerHTML += formatWord(getRandomWord());
+            }
+
+            const activeWord = wordsDiv.querySelector('.word') as HTMLElement;
+            const activeLetter = wordsDiv.querySelector('.letter') as HTMLElement;
+            if (activeWord) addClass(activeWord, 'current');
+            if (activeLetter) addClass(activeLetter, 'current');
+        }
+    }, [addClass, formatWord, getRandomWord]);
+
+    const handleKeyDown = useCallback((e: KeyboardEvent) => {
+        if (isTypingDisabled) return;
+
+        onTypingStart();
+
+        const key = e.key;
+        const currentWord = document.querySelector('.word.current') as HTMLElement;
+        const currentLetter = document.querySelector('.letter.current') as HTMLElement;
+        const expected = currentLetter?.innerHTML || ' ';
+
+        if (!currentWord) return;
+
+        const isLetter = key.length === 1 && key !== ' ';
+        const isSpace = key === ' ';
+        const isBackspace = key === 'Backspace';
+        const isFirstLetter = currentLetter === currentWord.firstChild;
+
+        if (isLetter) {
+            if (currentLetter) {
+                addClass(currentLetter, key === expected ? 'correct' : 'incorrect');
+                removeClass(currentLetter, 'current');
+                if (currentLetter.nextSibling) {
+                    addClass(currentLetter.nextSibling as HTMLElement, 'current');
+                }
+            } else {
+                const incorrectLetters = document.createElement('span');
+                incorrectLetters.innerHTML = key;
+                incorrectLetters.className = 'letter incorrect extra';
+                currentWord.appendChild(incorrectLetters);
+            }
+        }
+
+        if (isSpace) {
+            // Invalidate the current word if there are any incorrect letters
+            const lettersToInvalidate = Array.from(currentWord.querySelectorAll('.letter:not(.correct)')) as HTMLElement[];
+            if (lettersToInvalidate.length > 0) {
+                lettersToInvalidate.forEach(letter => {
+                    addClass(letter, 'incorrect');
+                });
+            }
+            removeClass(currentWord, 'current');
+            if (currentWord.nextSibling) {
+                addClass(currentWord.nextSibling as HTMLElement, 'current');
+                if (currentWord.nextSibling.firstChild) {
+                    addClass(currentWord.nextSibling.firstChild as HTMLElement, 'current');
+                }
+            }
+        }
+
+        if (isBackspace) {
+            if (currentLetter && isFirstLetter) {
+                removeClass(currentWord, 'current');
+                if (currentWord.previousSibling) {
+                    addClass(currentWord.previousSibling as HTMLElement, 'current');
+                    const lastChild = currentWord.previousSibling.lastChild as HTMLElement;
+                    if (lastChild) {
+                        addClass(lastChild, 'current');
+                        removeClass(lastChild, 'incorrect');
+                        removeClass(lastChild, 'correct');
+                    }
+                }
+            } else if (currentLetter && !isFirstLetter) {
+                removeClass(currentLetter, 'current');
+                addClass(currentLetter.previousSibling as HTMLElement, 'current');
+                removeClass(currentLetter.previousSibling as HTMLElement, 'incorrect');
+                removeClass(currentLetter.previousSibling as HTMLElement, 'correct');
+            } else {
+                const lastChild = currentWord.lastChild as HTMLElement;
+                if (lastChild) {
+                    addClass(lastChild, 'current');
+                    removeClass(lastChild, 'incorrect');
+                    removeClass(lastChild, 'correct');
+                    const extraLetters = currentWord.querySelectorAll('.letter.extra') as NodeListOf<HTMLElement>;
+                    if (extraLetters.length > 0) {
+                        extraLetters[extraLetters.length - 1].remove();
+                    }
+                }
+            }
+        }
+
+        if (currentWord.getBoundingClientRect().top > 200) {
+            const wordsDiv = wordsDivRef.current;
+            if (wordsDiv) {
+                const margin = parseInt(wordsDiv.style.marginTop || '0');
+                wordsDiv.style.marginTop = (margin - 35) + 'px';
+            }
+        }
+
+        const nextLetter = document.querySelector('.letter.current');
+        const nextWord = document.querySelector('.word.current');
+        const cursor = cursorRef.current;
+        if (cursor) {
+            cursor.style.top = (nextLetter || nextWord)!.getBoundingClientRect().top + 3 + 'px';
+            cursor.style.left = (nextLetter || nextWord)!.getBoundingClientRect()[nextLetter ? 'left' : 'right'] + 'px';
+        }
+    }, [addClass, onTypingStart, removeClass, isTypingDisabled]);
 
     useEffect(() => {
         newGame();
+
         // add event listener to the game div
-        const gameDiv = document.getElementById('game');
+        const gameDiv = gameDivRef.current;
+
         if (gameDiv) {
-            // Add keydown event listener
-            gameDiv.addEventListener('keydown', (e) => {
-                const key = e.key;//.toLowerCase();
-                const currentWord = document.querySelector('.word.current') as HTMLElement;
-                const currentLetter = document.querySelector('.letter.current') as HTMLElement;
-                const expected = currentLetter?.innerHTML || ' ';//.toLowerCase();
-
-                const isLetter = key.length === 1 && key !== ' ';
-                const isSpace = key === ' ';
-                const isBackspace = key === 'Backspace';
-                const isFirstLetter = currentLetter === currentWord.firstChild;
-
-                // DEBUG
-                console.log('key:', key);
-
-                if (isLetter) {
-                    if (currentLetter) {
-                        addClass(currentLetter, key === expected ? 'correct' : 'incorrect');
-                        removeClass(currentLetter, 'current');
-                        if (currentLetter.nextSibling) {
-                            addClass(currentLetter.nextSibling as HTMLElement, 'current');
-                        }
-                    } else {
-                        const incorrectLetters = document.createElement('span');
-                        incorrectLetters.innerHTML = key;
-                        incorrectLetters.className = 'letter incorrect extra';
-
-                        currentWord.appendChild(incorrectLetters);
-                    }
-                }
-
-                if (isSpace) {
-                    if (expected !== ' ') {
-                        const nodeList = document.querySelectorAll('.word.current .letter:not(.correct)') as NodeListOf<HTMLElement>;
-                        const lettersToInvalidate = Array.from(nodeList) as HTMLElement[];
-
-                        lettersToInvalidate.forEach(letter => {
-                            addClass(letter, 'incorrect');
-                        });
-                    }
-                    removeClass(currentWord, 'current');
-                    addClass(currentWord.nextSibling as HTMLElement, 'current');
-
-                    if (currentLetter) {
-                        removeClass(currentLetter, 'current');
-                    }
-
-                    addClass(currentWord.nextSibling!.firstChild as HTMLElement, 'current');
-                }
-
-                if (isBackspace) {
-                    if (currentLetter && isFirstLetter) {
-                        // make previous word current, last letter of previous word current
-                        removeClass(currentWord, 'current');
-                        addClass(currentWord.previousSibling as HTMLElement, 'current');
-                        removeClass(currentLetter, 'current');
-
-                        if (currentWord.previousSibling) {
-                            addClass(currentWord.previousSibling.lastChild as HTMLElement, 'current');
-                            removeClass(currentWord.previousSibling.lastChild as HTMLElement, 'incorrect');
-                            removeClass(currentWord.previousSibling.lastChild as HTMLElement, 'correct');
-                        } else {
-                            console.log('no previous sibling');
-                        }
-                    }
-                    if (currentLetter && !isFirstLetter) {
-                        // move back on letter
-                        removeClass(currentLetter, 'current');
-                        addClass(currentLetter.previousSibling as HTMLElement, 'current');
-                        removeClass(currentLetter.previousSibling as HTMLElement, 'incorrect');
-                        removeClass(currentLetter.previousSibling as HTMLElement, 'correct');
-                    }
-                    if (!currentLetter) {
-                        // remove last letter of current word
-                        addClass(currentWord.lastChild as HTMLElement, 'current');
-                        removeClass(currentWord.lastChild as HTMLElement, 'incorrect');
-                        removeClass(currentWord.lastChild as HTMLElement, 'correct');
-                    }
-                }
-
-                console.log('gameDiv Height:', gameDiv.scrollHeight);
-                console.log('CurrentWord GetBoundingClientRect:', currentWord?.getBoundingClientRect());
-                // move lines / words
-                if (currentWord && currentWord.getBoundingClientRect().top > 200) {
-                    const words = document.getElementById('words') as HTMLElement;
-                    const margin = parseInt(words.style.marginTop || '0');
-                    words.style.marginTop = (margin - 35) + 'px';
-                }
-
-                // cursor
-                // move cursor
-                const nextLetter = document.querySelector('.letter.current');
-                const nextWord = document.querySelector('.word.current');
-                const cursor = document.getElementById('cursor');
-                if (cursor) {
-                    cursor.style.top = (nextLetter || nextWord)!.getBoundingClientRect().top + 3 + 'px';
-                    cursor.style.left = (nextLetter || nextWord)!.getBoundingClientRect()[nextLetter ? 'left' : 'right'] + 'px';
-                }
-            });
+            gameDiv.addEventListener('keydown', handleKeyDown);
+            return () => {
+                gameDiv.removeEventListener('keydown', handleKeyDown);
+            };
         }
-    }, []);
-
-    function addClass(el: HTMLElement, className: string) {
-        el.className += ' ' + className;
-    }
-
-    function removeClass(el: HTMLElement, className: string) {
-        el.className = el.className.replace(className, '');
-    }
-
-
-    function getRandomWord() {
-        return words[Math.floor(Math.random() * words.length)];
-
-        // const randomIndex = Math.ceil(Math.random() * words.length);
-        // return words[randomIndex - 1];
-    }
-
-    function formatWord(word: string) {
-        // return `<div class="word">
-        //            <span class="letter">${word.split('').join('</span><span class="letter">')}</span>
-        //         </div>`;
-
-        return `<div class="word"><span class="letter">${word.split('').join('</span><span class="letter">')}</span></div>`;
-    }
-
-    // this function will start the game and initialize everything
-    const newGame = () => {
-        // reset the div with id words
-        const wordsDiv = document.getElementById('words');
-        if (wordsDiv) {
-            wordsDiv.innerHTML = '';
-        }
-
-        // will 'words' with random words
-        for (let i = 0; i < 200; i++) {
-            wordsDiv!.innerHTML += formatWord(getRandomWord());
-        }
-
-        // set the first word as active
-        const activeWord = document.querySelector('.word') as HTMLElement;
-        const activeLetter = document.querySelector('.letter') as HTMLElement;
-        if (activeWord) addClass(activeWord, 'current');
-        if (activeLetter) addClass(activeLetter, 'current');
-
-
-    }
+    }, [handleKeyDown, newGame]);
 
     return (
         <>
-            <div id="game" tabIndex={0}>
-                <div id="words"></div>
-                <div id="cursor"></div>
+            <div id="game" ref={gameDivRef} tabIndex={0}>
+                <div id="words" ref={wordsDivRef}></div>
+                <div id="cursor" ref={cursorRef}></div>
                 <div id="focus-error">Click here to focus!</div>
             </div>
         </>
-
     );
 };
 
-export default dynamic(() => Promise.resolve(TypingArea), {ssr: false});
+export default dynamic(() => Promise.resolve(TypingArea), { ssr: false });
