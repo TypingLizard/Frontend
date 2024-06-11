@@ -14,8 +14,8 @@ export default function Home() {
     };
 
     const handleTimeout = () => {
-        alert('Time is up!');
-        setIsTypingDisabled(true);
+        // alert('Time is up!');
+        // setIsTypingDisabled(true);
     };
 
     return (
@@ -25,7 +25,7 @@ export default function Home() {
                 <p>Welcome to your Next.js app.</p>
                 <div id="header">
                     <div id="info">
-                        <Timer initialTime={30} onTimeout={handleTimeout} start={startTimer}/>
+                        <Timer initialTime={100} onTimeout={handleTimeout} start={startTimer}/>
                     </div>
                     <div id="buttons">
                         <button id="newGame">New Game</button>
