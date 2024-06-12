@@ -16,12 +16,14 @@ const TypingArea = ({ onTypingStart, isTypingDisabled }: TypingAreaProps) => {
     const [timer, setTimer] = useState(GLOBAL_TIMER);
     const [words, setWords] = useState<string[]>([]);
     const [error, setError] = useState<string | null>(null);
+    const [mode, setMode] = useState<Mode>()
 
 
         const fetchData = async (): Promise<Mode | undefined> => {
             try {
                 const response = await axios.get<Mode>('http://localhost:8080/mode/id/1');
                 console.log("fetching Data")
+                setMode(response.data)
                 return response.data;
 
 
@@ -35,9 +37,9 @@ const TypingArea = ({ onTypingStart, isTypingDisabled }: TypingAreaProps) => {
     const wordsDivRef = useRef<HTMLDivElement>(null);
     const cursorRef = useRef<HTMLDivElement>(null);
 
-    const addClass = useCallback((el: HTMLElement, className: string) => {
+    const addClass = ((el: HTMLElement, className: string) => {
         el.classList.add(className);
-    }, []);
+    });
 
     const removeClass = useCallback((el: HTMLElement, className: string) => {
         el.classList.remove(className);
@@ -49,7 +51,8 @@ const TypingArea = ({ onTypingStart, isTypingDisabled }: TypingAreaProps) => {
         setWords(wordName);
 
         console.log(words)
-        return words[Math.floor(Math.random() * words.length)];
+
+        return wordName[Math.floor(Math.random() * words.length)];
     }, [words]);
 
     const formatWord = useCallback((word: string) => {
@@ -59,7 +62,9 @@ const TypingArea = ({ onTypingStart, isTypingDisabled }: TypingAreaProps) => {
 
     const newGame = useCallback((mode:Mode) => {
 
+
         setTimer(mode.modeTime);
+
 
 
         const wordsDiv = wordsDivRef.current;
@@ -179,6 +184,7 @@ const TypingArea = ({ onTypingStart, isTypingDisabled }: TypingAreaProps) => {
 
         const initializeGame = async () => {
             const mode = await fetchData();
+
             if (!mode) {
                 console.log("mode null")
 
@@ -186,6 +192,8 @@ const TypingArea = ({ onTypingStart, isTypingDisabled }: TypingAreaProps) => {
 
             }
             console.log("mode not null")
+            console.log(mode)
+            console.log(mode.wordList)
 
             newGame(mode);
         }
@@ -206,6 +214,8 @@ const TypingArea = ({ onTypingStart, isTypingDisabled }: TypingAreaProps) => {
 
     return (
         <>
+
+
             <div id="game" ref={gameDivRef} tabIndex={0}>
                 <div id="words" ref={wordsDivRef}></div>
                 <div id="cursor" ref={cursorRef}></div>
