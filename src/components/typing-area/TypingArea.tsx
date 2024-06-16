@@ -2,8 +2,9 @@
 
 import React, { useEffect, useState, useRef, useCallback } from 'react';
 import dynamic from "next/dynamic";
-import axios from "axios";
+
 import {Mode, Word} from "@/interfaces/modles";
+import axios from "axios";
 
 type TypingAreaProps = {
     onTypingStart: () => void;
@@ -223,6 +224,7 @@ const TypingArea = ({ onTypingStart, isTypingDisabled }: TypingAreaProps) => {
             </div>
         </>
     );
+
 };
 
 export default dynamic(() => Promise.resolve(TypingArea), { ssr: false });

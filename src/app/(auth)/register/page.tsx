@@ -5,34 +5,67 @@
  * Time : 10:50
  */
 
-import React from 'react';
-import Link from "next/link";
+"use client"
 
+import React, { useContext } from 'react';
+import Link from "next/link";
+import axios from 'axios';
+import AuthContext from '@/context/AuthContext';
+import {FieldValues, useForm} from "react-hook-form";
+axios.defaults.baseURL = "http://localhost:8080";
 
 const Register = () => {
+
+
+
+    const { username, setUsername, token, setToken, error, setError } = useContext(AuthContext);
+    const { register, handleSubmit } = useForm();
+
+
+
+    const onSubmit = async (data: FieldValues) => {
+        try {
+            const response = await axios.post('/api/v1/auth/register', data);
+            const token = response.data.token;
+            setToken(token);
+
+
+            setUsername(username);
+
+            console.log("username = " +username)
+            console.log("token = " + token)
+
+
+
+        } catch (err) {
+            setError('Registration failed. Please try again.');
+            console.error(err);
+        }
+    };
+
     return (
         <div style={styles.container}>
             <h1 style={styles.header}>Register</h1>
-            <form style={styles.form}>
+            <form style={styles.form} onSubmit={handleSubmit(onSubmit)}>
                 <div style={styles.inputGroup}>
                     <label htmlFor="username" style={styles.label}>Username</label>
-                    <input type="text" id="username" name="username" style={styles.input}/>
+                    <input type="text" id="username" style={styles.input}  {...register("username")} />
                 </div>
                 <div style={styles.inputGroup}>
                     <label htmlFor="password" style={styles.label}>Password</label>
-                    <input type="password" id="password" name="password" style={styles.input}/>
+                    <input type="password" id="password"  style={styles.input}  {...register("password")} />
                 </div>
                 <div style={styles.inputGroup}>
                     <label htmlFor="email" style={styles.label}>Email</label>
-                    <input type="email" id="email" name="email" style={styles.input}/>
+                    <input type="email" id="email" style={styles.input} {...register("email")} />
                 </div>
-                <div >
-                    <button style={styles.button}><Link href="/login">Back to login</Link>
+                {error && <p style={styles.error}>{error}</p>}
+                <div>
+                    <button style={styles.button}>
+                        <Link href="/login">Back to login</Link>
                     </button>
                     <button type="submit" style={styles.button}>Register</button>
                 </div>
-
-
             </form>
         </div>
     );
@@ -82,6 +115,10 @@ const styles = {
         cursor: 'pointer',
         marginRight: 5
     },
+    error: {
+        color: 'red',
+        marginBottom: '10px'
+    }
 };
 
 export default Register;
