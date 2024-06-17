@@ -1,9 +1,11 @@
 import React from 'react';
+import Navbar from "@/components/navbar/Navbar";
+import styles from "./account.module.css";
 
 const AccountPage = () => {
     return (
-        <div>
-            <h1>Account Page</h1>
+        <div className="App">
+
         </div>
     );
 };

@@ -12,12 +12,13 @@ import Link from "next/link";
 import axios from 'axios';
 import AuthContext from '@/context/AuthContext';
 import {FieldValues, useForm} from "react-hook-form";
+import {setCookie} from "nookies";
 axios.defaults.baseURL = "http://localhost:8080";
 
 const Register = () => {
 
 
-
+    // get the context
     const { username, setUsername, token, setToken, error, setError } = useContext(AuthContext);
     const { register, handleSubmit } = useForm();
 
@@ -25,18 +26,21 @@ const Register = () => {
 
     const onSubmit = async (data: FieldValues) => {
         try {
+            // use axois to create an post request
             const response = await axios.post('/api/v1/auth/register', data);
             const token = response.data.token;
+
+
+
+            // set the infos in the context so its usable
             setToken(token);
-
-
             setUsername(username);
+            setCookie(null, 'token', token, {
+                maxAge: 30 * 24 * 60 * 60,
+                path: '/',
+            });
 
-            console.log("username = " +username)
-            console.log("token = " + token)
-
-
-
+            window.location.href = '/';
         } catch (err) {
             setError('Registration failed. Please try again.');
             console.error(err);

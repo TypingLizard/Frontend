@@ -3,6 +3,8 @@
 
 import {useState} from 'react';
 import TypingArea from "@/components/typing-area/TypingArea";
+import Navbar from "@/components/navbar/Navbar";
+import Footer from "@/components/footer/Footer";
 import Timer from "@/components/timer/Timer";
 
 export default function Home() {
@@ -20,6 +22,7 @@ export default function Home() {
 
     return (
         <>
+            <Navbar/>
             <main>
                 <h1>Home</h1>
                 <p>Welcome to your Next.js app.</p>

@@ -1,5 +1,12 @@
 "use client";
 
+/**
+ * Project: Typing_Lizard_Frontend
+ * Author : Alexander Friedl
+ * Date : 15.06.2024
+ * Time : 11:25
+ */
+
 import { useContext } from 'react';
 import Link from "next/link";
 import AuthContext from "@/context/AuthContext";
@@ -9,19 +16,20 @@ import { setCookie } from 'nookies';
 axios.defaults.baseURL = "http://localhost:8080";
 
 const Login = () => {
+    // get the context
     const { username, setUsername, token, setToken, error, setError } = useContext(AuthContext);
     const { register, handleSubmit } = useForm();
 
     const onSubmit = async (data: FieldValues) => {
         try {
+            // use axois to create an post request
             const response = await axios.post('/api/v1/auth/authenticate', data);
             const { token, username } = response.data;
 
+
+
+            // set the infos in the context so its usable
             setUsername(username);
-
-            console.log("username = " +username)
-            console.log("token = " + token)
-
             setToken(token);
             setCookie(null, 'token', token, {
                 maxAge: 30 * 24 * 60 * 60,

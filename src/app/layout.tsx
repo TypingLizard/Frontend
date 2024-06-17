@@ -22,7 +22,7 @@ export default function RootLayout({
 
     <html lang="en">
       <body>
-      <div>
+      <div style={{minHeight: "100vh"}}>
         {/*<Navbar/>*/}
         {children}
         <Footer/>
