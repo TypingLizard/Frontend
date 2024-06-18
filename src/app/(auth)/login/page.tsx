@@ -22,7 +22,7 @@ const Login = () => {
 
     const onSubmit = async (data: FieldValues) => {
         try {
-            // use axois to create an post request
+            // use axois to create a post request
             const response = await axios.post('/api/v1/auth/authenticate', data);
             const { token, username } = response.data;
 
