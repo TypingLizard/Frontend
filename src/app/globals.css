@@ -72,6 +72,14 @@ div#game {
     padding-top: 35px;
 }
 
+#game-over {
+    position: absolute;
+    inset: 0;
+    text-align: center;
+    padding-top: 35px;
+    color: var(--primaryColor);
+}
+
 #words {
     filter: blur(5px);
     color: var(--textSecondary);

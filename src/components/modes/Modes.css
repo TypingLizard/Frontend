@@ -1,0 +1,28 @@
+.modes-container {
+    display: flex;
+    justify-content: center;
+    padding: 10px;
+}
+
+.mode-button {
+    background-color: #1a1a1a;
+    color: #fd4;
+    border: none;
+    padding: 10px 20px;
+    margin: 5px;
+    font-family: 'Courier New', Courier, monospace;
+    font-size: 14px;
+    cursor: pointer;
+    transition: background-color 0.3s, color 0.3s;
+    border-radius: 5px;
+    text-transform: lowercase;
+}
+
+.mode-button:hover {
+    background-color: #444444;
+    color: #fd4;
+}
+
+.mode-button:focus {
+    outline: none;
+}
