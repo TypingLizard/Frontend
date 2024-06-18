@@ -14,14 +14,21 @@
     "nookies": "^2.5.2",
     "react": "^18",
     "react-chartjs-2": "^5.2.0",
+    "react-data-table-component": "^7.6.2",
     "react-dom": "^18",
-    "next": "14.1.4",
     "react-icons": "^5.2.1",
+    "-": "^0.0.1",
+    "@nextui-org/react": "^2.4.0",
+    "next": "14.1.4",
     "react-router-dom": "^6.23.1",
     "styled-components": "^6.1.11",
     "node": "^20.14.0",
     "react-hook-form": "^7.52.0",
-    "universal-cookie": "^7.1.4"
+    "universal-cookie": "^7.1.4",
+    "react-timer-hook": "^3.0.7",
+    "react-window": "^1.8.10",
+    "reactstrap": "^9.2.2",
+    "save": "^2.9.0"
   },
   "devDependencies": {
     "typescript": "^5",
@@ -30,6 +37,8 @@
     "@types/react-dom": "^18",
     "css-loader": "^7.1.2",
     "eslint": "^8",
-    "eslint-config-next": "14.1.4"
+    "eslint-config-next": "14.1.4",
+    "@types/chart.js": "^2.9.41",
+    "@types/react-window": "^1.8.8"
   }
 }

@@ -1,0 +1,17 @@
+.greyLabel {
+    color: lightgray;
+}
+
+.statisticLabels {
+    background-color: grey;
+    width: 600px;
+    padding: 10px;
+    margin: 10px;
+    border-radius: 15px;
+}
+
+.labelContainer {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-around;
+}

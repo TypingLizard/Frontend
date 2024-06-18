@@ -1,0 +1,7 @@
+.chart {
+    display: flex;
+    flex-grow: inherit;
+    background-color: black;
+    color: white;
+    width: auto;
+}

@@ -7,6 +7,10 @@ import Timer from "@/components/timer/Timer";
 import Modes from "@/components/modes/Modes";
 import {useGameLoopContext} from "@/context/GameLoopContext";
 import {useRouter} from "next/navigation";
+import MainStatistics from "@/app/main-statistic-page/MainStatisticsPage";
+import GameStatisticsPage from "@/app/game-statistic-page/GameStatisticsPage";
+import Information from "./user-information.json"
+
 
 export default function Home() {
     const {setIsTypingDisabled} = useGameLoopContext();
@@ -17,6 +21,7 @@ export default function Home() {
         setIsTypingDisabled(true);
         handleRedirect()
     };
+
 
     // useEffect(() => {
     //     if (isGameOver) {
@@ -29,6 +34,12 @@ export default function Home() {
         router.push('/game-over');
     }
 
+
+    /**
+     * Returns one of the statistic pages
+     *
+     * @returns One of the statistic pages
+     */
     return (
         <>
             <Navbar/>
@@ -40,6 +51,7 @@ export default function Home() {
                         <Timer onTimeout={handleTimeout}/>
                     </div>
                 </div>
+
                 <TypingArea/>
                 <Modes/>
             </main>
