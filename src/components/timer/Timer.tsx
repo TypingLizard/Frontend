@@ -1,36 +1,34 @@
-// components/timer/Timer.tsx
 "use client"
 
 import React, { useEffect, useState } from 'react';
+import {useGlobalTimerContext} from "@/context/GlobalTimerContext";
 
 type TimerProps = {
-    initialTime: number;
     onTimeout: () => void;
-    start: boolean;
 };
 
-const Timer = ({ initialTime, onTimeout, start }: TimerProps) => {
-    const [timeLeft, setTimeLeft] = useState(initialTime);
+const Timer = ({ onTimeout }: TimerProps) => {
+    const { globalTimer, setGlobalTimer } = useGlobalTimerContext();
+    const { isTimerRunning, setIsTimerRunning } = useGlobalTimerContext();
 
     useEffect(() => {
-        if (!start) return;
+        if (!isTimerRunning) return;
 
-        if (timeLeft <= 0) {
+        if (globalTimer <= 0) {
             onTimeout();
             return;
         }
 
         const timerId = setInterval(() => {
-            setTimeLeft((prevTime) => prevTime - 1);
+            setGlobalTimer((prevTime) => prevTime - 1);
         }, 1000);
 
         return () => clearInterval(timerId);
-    }, [timeLeft, start, onTimeout]);
+    }, [globalTimer, isTimerRunning, onTimeout, setGlobalTimer]);
 
     return (
         <div>
-            <p>Time Left: {timeLeft}</p>
-            {timeLeft === 0 && <p>Time is up!</p>}
+            <p>Time Left: {globalTimer}</p>
         </div>
     );
 };
