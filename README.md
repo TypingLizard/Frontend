@@ -6,7 +6,7 @@ Welcome to the TypingLizard frontend repository. This project is built with mode
 
 Ensure you have the following installed on your local machine:
 - Node.js (v14 or higher)
-- npm (v6 or higher) or Bun
+- npm (v6 or higher) or Bun (v1 or higher)
 
 ## Setup Instructions
 
