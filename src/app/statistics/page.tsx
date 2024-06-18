@@ -8,6 +8,7 @@
 import React from 'react';
 import GameStatisticsPage from "@/app/game-statistic-page/GameStatisticsPage";
 import Information from "@/app/user-information.json";
+import MainStatistics from "@/app/main-statistic-page/MainStatisticsPage";
 
 const Page = () => {
 
@@ -34,6 +35,8 @@ const Page = () => {
         <div>
             {<GameStatisticsPage username={getUsername()} profilePic={getProfilePic()}/>}
 
+
+            <MainStatistics username={getUsername()} profilePic={getProfilePic()}/>
         </div>
     );
 };
