@@ -23,7 +23,9 @@ Install the project dependencies using npm or Bun:
 
 ```sh
 npm install
-# or
+```
+or
+```sh
 bun install
 ```
 
@@ -41,7 +43,9 @@ Start the development server:
 
 ```sh
 npm start
-# or
+```
+or
+```sh
 bun start
 ```
 
