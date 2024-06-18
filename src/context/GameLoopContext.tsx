@@ -13,6 +13,13 @@ type GameLoopContext = {
     setIsTypingDisabled: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
+/**
+ * A context provider that provides the game loop state and the ability to set the game loop state.
+ * The game loop state is used to determine if the game is over and if typing is disabled.
+ * @param children The children of the context provider.
+ * @constructor
+ * @return The game loop context provider.
+ */
 export const GameLoopContext = createContext<GameLoopContext | null>(null);
 
 export default function GameLoopContextProvider({children}: GameLoopContextProps) {
@@ -32,6 +39,10 @@ export default function GameLoopContextProvider({children}: GameLoopContextProps
     );
 }
 
+/**
+ * A hook that provides the game loop context.
+ * @return The game loop context.
+ */
 export function useGameLoopContext() {
     const context = useContext(GameLoopContext);
     if (!context) {

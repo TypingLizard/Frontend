@@ -16,6 +16,14 @@ type GlobalTimerContext = {
 
 export const GlobalTimerContext = createContext<GlobalTimerContext | null>(null);
 
+/**
+ * A context provider that provides the global timer and the ability to set the global timer.
+ * The global timer is used to keep track of the time left in the game.
+ * The timer is in seconds.
+ * @param children The children of the context provider.
+ * @constructor
+ * @return The global timer context provider.
+ */
 export default function GlobalTimerContextProvider({children}: GlobalTimerContextProps) {
     const [globalTimer, setGlobalTimer] = useState<GlobalTimer>(25);
     const [isTimerRunning, setIsTimerRunning] = useState(false);
@@ -33,6 +41,10 @@ export default function GlobalTimerContextProvider({children}: GlobalTimerContex
     );
 }
 
+/**
+ * A hook that provides the global timer context.
+ * @return The global timer context.
+ */
 export function useGlobalTimerContext() {
     const context = useContext(GlobalTimerContext);
     if (!context) {

@@ -7,7 +7,7 @@
 
 
 export interface Mode {
-    modeid: number;
+    modeID: number;
     nameName: string;
     modeTime: number;
     wordList: Word[]

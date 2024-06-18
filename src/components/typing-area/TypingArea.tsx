@@ -6,13 +6,8 @@ import {useGameModeContext} from "@/context/GameModeContext";
 import {useGlobalTimerContext} from "@/context/GlobalTimerContext";
 import {useGameLoopContext} from "@/context/GameLoopContext";
 import {addClass, formatWord, generateGibberishWord, getRandomWord, removeClass} from "@/helpers/typingAreaHelpers";
-import {router} from "next/client";
 
-type TypingAreaProps = {
-    onTypingStart: () => void;
-};
-
-const TypingArea = ({onTypingStart}: TypingAreaProps) => {
+const TypingArea = () => {
 
     const [words] = useState([
         "time", "year", "people", "way", "day", "man", "thing", "woman", "life", "child",
@@ -30,7 +25,7 @@ const TypingArea = ({onTypingStart}: TypingAreaProps) => {
 
     // useContext hooks ----------------------------------------------------------------------------------------------------------------------------------------
     const {gameMode} = useGameModeContext();
-    const {globalTimer, setGlobalTimer, isTimerRunning, setIsTimerRunning} = useGlobalTimerContext();
+    const {setGlobalTimer, setIsTimerRunning} = useGlobalTimerContext();
     const {isGameOver, setIsGameOver, isTypingDisabled, setIsTypingDisabled} = useGameLoopContext();
 
     const gameDivRef = useRef<HTMLDivElement>(null);
@@ -57,6 +52,13 @@ const TypingArea = ({onTypingStart}: TypingAreaProps) => {
             wordsDivRef.current!.innerHTML += formatWord(generateGibberishWord());
         }
     }, [setGlobalTimer]);
+
+    const gameModeWords50 = useCallback(() => {
+        setGlobalTimer(25);
+        for (let i = 0; i < 50; i++) {
+            wordsDivRef.current!.innerHTML += formatWord(getRandomWord(words));
+        }
+    }, [setGlobalTimer, words]);
 
     // EVENT HANDLERS ------------------------------------------------------------------------------------------------------------------------------------------
     const handleKeyDown = useCallback((e: KeyboardEvent) => {
@@ -197,7 +199,7 @@ const TypingArea = ({onTypingStart}: TypingAreaProps) => {
             }
 
 
-            if (currentWord.getBoundingClientRect().top > 200) {
+            if (currentWord.getBoundingClientRect().top > 300) {
                 const wordsDiv = wordsDivRef.current;
                 if (wordsDiv) {
                     const margin = parseInt(wordsDiv.style.marginTop || '0');
@@ -239,7 +241,7 @@ const TypingArea = ({onTypingStart}: TypingAreaProps) => {
                     gameModeStandard();
                     break;
                 case "Words10":
-                    gameModeStandard();
+                    gameModeWords50();
                     break;
                 case "Words1000":
                 default:
@@ -252,7 +254,7 @@ const TypingArea = ({onTypingStart}: TypingAreaProps) => {
             if (activeWord) addClass(activeWord, 'current');
             if (activeLetter) addClass(activeLetter, 'current');
         }
-    }, [setIsGameOver, setIsTimerRunning, gameMode, gameModeStandard, gameModeGibberish]);
+    }, [setIsGameOver, setIsTimerRunning, gameMode, gameModeStandard, gameModeGibberish, gameModeWords50]);
 
     // main game loop ------------------------------------------------------------------------------------------------------------------------------------------
     useEffect(() => {
@@ -277,7 +279,20 @@ const TypingArea = ({onTypingStart}: TypingAreaProps) => {
 
     }, [handleKeyDown, isTypingDisabled, newGame, setIsGameOver]);
 
-    // handle game over ----------------------------------------------------------------------------------------------------------------------------------------
+    // DEBUG ---------------------------------------------------------------------------------------------------------------------------------------------------
+    // useEffect(() => {
+    //     const logCursorPosition = (e: MouseEvent) => {
+    //         console.log(`Cursor position: X = ${e.clientX}, Y = ${e.clientY}`);
+    //     };
+    //
+    //     // Add the event listener when the component mounts
+    //     window.addEventListener('mousemove', logCursorPosition);
+    //
+    //     // Remove the event listener when the component unmounts
+    //     return () => {
+    //         window.removeEventListener('mousemove', logCursorPosition);
+    //     };
+    // }, []);
 
     return (
         <>

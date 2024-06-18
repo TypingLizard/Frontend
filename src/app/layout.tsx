@@ -1,14 +1,11 @@
 import type {Metadata} from "next";
-import {Inter} from "next/font/google";
 import "./globals.css";
-import Navbar from "@/components/navbar/Navbar";
 import Footer from "@/components/footer/Footer";
-import GameModeContextProvider, {GameModeContext} from "@/context/GameModeContext";
+import GameModeContextProvider from "@/context/GameModeContext";
 import GlobalTimerContextProvider from "@/context/GlobalTimerContext";
 import GameLoopContextProvider from "@/context/GameLoopContext";
-import { AuthContextProvider } from "@/context/AuthContext";
-
-const inter = Inter({subsets: ["latin"]});
+import {AuthContextProvider} from "@/context/AuthContext";
+import React from "react";
 
 export const metadata: Metadata = {
     title: "Create Next App",
@@ -23,17 +20,17 @@ export default function RootLayout({
     return (
         <html lang="en">
         <body>
-        <div>
+        <div style={{height: '100vh'}}>
             <AuthContextProvider>
-            <GameLoopContextProvider>
-                <GameModeContextProvider>
-                    <GlobalTimerContextProvider>
-                        {/*<Navbar/>*/}
-                        {children}
-                        <Footer/>
-                    </GlobalTimerContextProvider>
-                </GameModeContextProvider>
-            </GameLoopContextProvider>
+                <GameLoopContextProvider>
+                    <GameModeContextProvider>
+                        <GlobalTimerContextProvider>
+                            {/*<Navbar/>*/}
+                            {children}
+                            <Footer/>
+                        </GlobalTimerContextProvider>
+                    </GameModeContextProvider>
+                </GameLoopContextProvider>
             </AuthContextProvider>
         </div>
         </body>
