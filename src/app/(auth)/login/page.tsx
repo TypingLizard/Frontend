@@ -20,15 +20,19 @@ const Login = () => {
     const { username, setUsername, token, setToken, error, setError } = useContext(AuthContext);
     const { register, handleSubmit } = useForm();
 
+
+    /**
+     * post the log in as and save the token in the cookie
+     * @param data
+     */
     const onSubmit = async (data: FieldValues) => {
         try {
-            // use axois to create a post request
+            // use axios to create a post request
             const response = await axios.post('/api/v1/auth/authenticate', data);
             const { token, username } = response.data;
 
 
 
-            // set the infos in the context so its usable
             setUsername(username);
             setToken(token);
             setCookie(null, 'token', token, {

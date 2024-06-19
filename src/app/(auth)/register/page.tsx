@@ -23,16 +23,18 @@ const Register = () => {
     const { register, handleSubmit } = useForm();
 
 
-
+    /**
+     * post the register and save the token in the cookie
+     * @param data
+     */
     const onSubmit = async (data: FieldValues) => {
         try {
-            // use axois to create an post request
+            // use axios to create a post request
             const response = await axios.post('/api/v1/auth/register', data);
             const token = response.data.token;
 
 
 
-            // set the infos in the context so its usable
             setToken(token);
             setUsername(username);
             setCookie(null, 'token', token, {
