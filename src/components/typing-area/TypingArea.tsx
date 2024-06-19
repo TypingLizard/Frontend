@@ -40,21 +40,21 @@ const TypingArea = () => {
 
     // GAME MODES ----------------------------------------------------------------------------------------------------------------------------------------------
     const gameModeStandard = useCallback(() => {
-        setGlobalTimer(25);
+        setGlobalTimer(10);
         for (let i = 0; i < 25; i++) {
             wordsDivRef.current!.innerHTML += formatWord(getRandomWord(words));
         }
     }, [setGlobalTimer, words]);
 
     const gameModeGibberish = useCallback(() => {
-        setGlobalTimer(25);
+        setGlobalTimer(10);
         for (let i = 0; i < 25; i++) {
             wordsDivRef.current!.innerHTML += formatWord(generateGibberishWord());
         }
     }, [setGlobalTimer]);
 
     const gameModeWords50 = useCallback(() => {
-        setGlobalTimer(25);
+        setGlobalTimer(10);
         for (let i = 0; i < 50; i++) {
             wordsDivRef.current!.innerHTML += formatWord(getRandomWord(words));
         }

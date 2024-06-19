@@ -25,7 +25,7 @@ export const GlobalTimerContext = createContext<GlobalTimerContext | null>(null)
  * @return The global timer context provider.
  */
 export default function GlobalTimerContextProvider({children}: GlobalTimerContextProps) {
-    const [globalTimer, setGlobalTimer] = useState<GlobalTimer>(25);
+    const [globalTimer, setGlobalTimer] = useState<GlobalTimer>(10);
     const [isTimerRunning, setIsTimerRunning] = useState(false);
 
     return (
